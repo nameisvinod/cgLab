@@ -5,19 +5,19 @@
 using namespace std;
 
 void display();
-float xmin=-100;
-float ymin=-100;
-float xmax=100;
-float ymax=100;
+float xmin=220;
+float ymin=220;
+float xmax=420;
+float ymax=420;
 float xd1,yd1,xd2,yd2;
 
 int code(float x,float y)
 {
     int c=0;
-    if(y>ymax)c=TOP;
-    if(y<ymin)c=BOTTOM;
-    if(x>xmax)c=c|RIGHT;
-    if(x<xmin)c=c|LEFT;
+    if(y>ymax)c=8;
+    if(y<ymin)c=4;
+    if(x>xmax)c=c|2;
+    if(x<xmin)c=c|1;
     return c;
 }
 
@@ -28,9 +28,9 @@ void cohen_Line(float x1,float y1,float x2,float y2)
     while((c1|c2)>0){
     	float m=(y2-y1)/(x2-x1);
 		//AND of both codes != 0.Line is outside. Reject line
-        if((c1 & c2)>0){
-           exit(0);
-        }
+      if((c1 & c2)>0){
+          exit(0);
+      }
 
     	float xi=x1;float yi=y1;
     	int c=c1;
@@ -68,7 +68,7 @@ void cohen_Line(float x1,float y1,float x2,float y2)
            	y=yi+m*(xmin-xi);
        	}
 			//Check which point we had selected earlier as temp, and replace its co-ordinates
-       	
+
        	if(c==c1){
            xd1=x;
            yd1=y;
@@ -113,7 +113,7 @@ void display()
 
 void init(void)
 {
-	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	  glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
     glutInitWindowSize(600,600);
     glutInitWindowPosition(0,0);
     glutCreateWindow("Clipping");
@@ -121,7 +121,7 @@ void init(void)
     glutKeyboardFunc(mykey);
     glClearColor(0.0,0,0,0);
     glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(-300,300,-300,300);
+    gluOrtho2D(0 , 640 , 0 , 640);
 
 }
 int main(int argc,char** argv)
