@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <queue>
+#include <set>
 #include <iostream>
 using namespace std;
 static int DEBUGG = 1;
@@ -21,6 +22,7 @@ int ww = 600, wh = 500;
 float bgCol[3] = {0.0, 0.0,0.0};
 float intCol[3] = {1.0,0.0,0.0};
 float fillCol[3] = {0.0,0.0,1.0};
+set<Point> dfs;
 void setPixel(int pointx, int pointy, float f[3])
 {
        glBegin(GL_POINTS);
@@ -35,22 +37,14 @@ void getPixel(int x, int y, float pixels[3])
 }
 void drawPolygon(int x1, int y1, int x2, int y2)
 {
-	glColor3f(1.0,0.0,0.0);
-   	glBegin(GL_LINE_LOOP);
-   	glVertex2i(x1,y1);
-   	glVertex2i(x1,y2);
-   	glVertex2i(x2,y2);
-   	glVertex2i(x2,y1);
-   	glEnd();
-	glFlush();
-      //  glColor3f(1.0, 0.0, 0.0);
-      //  glBegin(GL_POLYGON);
-      //       glVertex2i(x1, y1);
-      //       glVertex2i(x1, y2);
-      //       glVertex2i(x2, y2);
-      //       glVertex2i(x2, y1);
-      //  glEnd();
-      //  glFlush();
+       glColor3f(1.0, 0.0, 0.0);
+       glBegin(GL_POLYGON);
+            glVertex2i(x1, y1);
+            glVertex2i(x1, y2);
+            glVertex2i(x2, y2);
+            glVertex2i(x2, y1);
+       glEnd();
+       glFlush();
 }
 void display()
 {
@@ -59,80 +53,59 @@ void display()
        drawPolygon(100,100,200,200);
        glFlush();
 }
-int checkPoint(int x , int y, float color[3], float oldcolor[3], float newcolor[3]){
+int checkPoint(Point p, float oldcolor[3], float newcolor[3]){
+	float color[3];
+	getPixel(p.x,p.y,color);
   int isOldColor = color[0]==oldcolor[0] && (color[1])==oldcolor[1] && (color[2])==oldcolor[2] ;
 	int notNewColor = (color[0]!=newcolor[0]) || (color[1]!=newcolor[1]) || (color[2]!=newcolor[2]) ;
-	return notNewColor;
+	return isOldColor;
 }
-void floodFill8(int x,int y,float oldcolor[3],float newcolor[3])
+
+// Flood-fill (node, target-color, replacement-color):
+//  1. Set Q to the empty queue.
+//  2. If the color of node is not equal to target-color, return.
+//  3. Add node to the end of Q.
+//  4. For each element n of Q:
+//  5.  Set w and e equal to n.
+//  6.  Move w to the west until the color of the node to the west of w no longer matches target-color.
+//  7.  Move e to the east until the color of the node to the east of e no longer matches target-color.
+//  8.  Set the color of nodes between w and e to replacement-color.
+//  9.  For each node n between w and e:
+// 10.   If the color of the node to the north of n is target-color, add that node to the end of Q.
+//       If the color of the node to the south of n is target-color, add that node to the end of Q.
+// 11. Continue looping until Q is exhausted.
+// 12. Return.
+
+void floodFill(Point seed,float oldcolor[3],float newcolor[3])
 {
-      float color[3];
-      getPixel(x,y,color);
-			if(color[0]==oldcolor[0] && (color[1])==oldcolor[1] && (color[2])==oldcolor[2]){
-				setPixel(x,y,newcolor);
+      queue<Point> Q;
+			if(!checkPoint(seed,oldcolor,newcolor))
 				return;
+			Q.push(seed);
+			while(!Q.empty()){
+				seed = Q.front();
+				Q.pop();
+				Point west = seed;
+				Point east = seed;
+				while(checkPoint(west,oldcolor,newcolor))
+					west = Point(west.x-1, west.y);
+				while(checkPoint(east,oldcolor,newcolor))
+					east = Point(east.x+1, east.y);
+				for(int i = west.x+1;i<=east.x;i++){
+					setPixel(i, seed.y, newcolor);
+					Point north(i, seed.y+1);
+					Point south(i, seed.y-1);
+					if(checkPoint(north,oldcolor,newcolor))
+						Q.push(north);
+					if(checkPoint(south,oldcolor,newcolor))
+						Q.push(south);
+				}
 			}
-			if(checkPoint(x, y, color, oldcolor, newcolor)){
-				setPixel(x,y,newcolor);
-				floodFill8(x + 1, y    , oldcolor, newcolor);
-				floodFill8(x - 1, y    , oldcolor, newcolor);
-				floodFill8(x    , y + 1, oldcolor, newcolor);
-				floodFill8(x    , y - 1, oldcolor, newcolor);
-				// floodFill8(x + 1, y + 1, oldcolor, newcolor);
-				// floodFill8(x - 1, y - 1, oldcolor, newcolor);
-				// floodFill8(x - 1, y + 1, oldcolor, newcolor);
-				// floodFill8(x + 1, y - 1, oldcolor, newcolor);
-      }
 }
-int isReplacementColor(int x, int y, float oldcolor[3]){
-  float color[3];
-  getPixel(x,y,color);
-  return ((color[0]==oldcolor[0]) && (color[1]==oldcolor[1]) && (color[2]==oldcolor[2]));
-}
-// void floodfill4(int x,int y,float oldcolor[3],float newcolor[3])
-// {
-//       float color[3];
-//       getPixel(x,y,color);
-//       // if((color[0]==newcolor[0]) && (color[1]==newcolor[1]) && (color[2]==newcolor[2]))
-//       //   return;
-//       if((color[0]!=oldcolor[0]) || (color[1]!=oldcolor[1]) || (color[2]!=oldcolor[2]))
-//         return;
-//       queue<Point> Q;
-//       int count = 0;
-//       setPixel(x,y,newcolor);
-//       Q.push(Point(x, y));
-//       while(!Q.empty()){
-//         cout<<count++<<endl;
-//         Point p = Q.front();
-//         Q.pop();
-//         if(isReplacementColor(p.x-1, p.y, oldcolor)){
-//           setPixel(p.x-1, p.y,newcolor);
-//           Q.push(Point(p.x-1, p.y));
-//         }
-//         if(isReplacementColor(p.x+1, p.y, oldcolor)){
-//           setPixel(p.x+1, p.y, newcolor);
-//           Q.push(Point(p.x+1, p.y));
-//         }
-//         if(isReplacementColor(p.x, p.y+1, oldcolor)){
-//           setPixel(p.x, p.y+1,newcolor);
-//           Q.push(Point(p.x, p.y+1));
-//         }
-//         if(isReplacementColor(p.x, p.y-1, oldcolor)){
-//           setPixel(p.x, p.y-1,newcolor);
-//           Q.push(Point(p.x, p.y-1));
-//         }
-//       }
-// }
 void mouse(int btn, int state, int x, int y)
 {
        if(btn==GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-       {
-               int xi = x;
-               int yi = (wh-y);
-              //  cout<<x<<"  "<<y<<endl;
-               floodFill8(xi,yi,intCol,fillCol);
-							 cout<<"function end"<<endl;
-       }
+          floodFill(Point(x, wh-y),intCol,fillCol);
 }
 void myinit()
 {
