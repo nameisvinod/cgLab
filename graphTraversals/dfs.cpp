@@ -1,96 +1,70 @@
 #include "iostream"
 #include "vector"
 #include "algorithm"
+#include "queue"
 #define max 2147483647
 #define true 1
 #define false 0
 using namespace std;
 typedef int Boolean;
-class Node{
-public:
-        vector<int> adj;
-        int value;
-        int dist;
-        Boolean visited = false;
-        Node(int value){
-            this->value = value;
-            this->dist = max;
-        }
-        Boolean isVisited(){
-            return visited;
-        }
-        void setVisited(){
-            visited = true;
-        }
-        void setDistance(int d){
-            dist = d;
-        }
-        int getDistance(){
-            return dist;
-        }
-    };
-    bool operator==(Node &n1, const Node &n2){return n1.value == n2.value;}
-    class Graph{
-    public:
-        vector<Node> nodes;
-        int dist;
-        Graph(){
-          dist = 0;
-        };
-        void addVertex(int v){
-            nodes.push_back(Node(v));
-        }
-        void addEdge(int x, int y){
-          nodes[x-1].adj.push_back(y);
-          nodes[y-1].adj.push_back(x);
-        }
-        void print(){
-          for(int i = 0;i<nodes.size();i++){
-            cout<<nodes[i].value <<"------->";
-            for(int j=0;j<nodes[i].adj.size();j++)
-              cout<<nodes[i].adj[j]<<" --> ";
-            cout<<endl;
-          }
-          for(int i = 0;i<nodes.size();i++)
-            cout<< nodes[i].value <<" : "<<nodes[i].getDistance()<<endl;
-
-        }
-        void explore(Node n) {
-            nodes[n.value-1].setVisited();
-            for (int i=0;i<n.adj.size();i++) {
-                Node m = nodes[n.adj[i]-1];
-                if(!m.isVisited()){
-                  nodes[m.value-1].setDistance(nodes[n.value-1].getDistance()+1);
-                  explore(m);
-                }
+class Graph{
+    int V, E;
+    vector<vector<int> > adj;
+    vector<int> dist;
+  public:
+    Graph(int V, int E){
+        this->V = V;
+        this->E = E;
+        adj = vector<vector<int> >(V, vector<int>());
+        dist = vector<int>(V);
+    }
+    void addEdge(int u, int v)
+    {
+      adj[u - 1].push_back(v);
+      adj[v - 1].push_back(u);
+    }
+    void print(){
+      for(int i=0;i<adj.size();i++){
+        cout<< i+1 << "-----> ";
+        for(int j=0;j<adj[i].size();j++)
+          cout<<adj[i][j]<<"  ";
+        cout<<endl;
+      }
+    }
+    void explore(int n) {
+        // cout<<n<<endl;
+        for (int i=0;i<adj[n-1].size();i++) {
+            int o = adj[n-1][i];
+            if(dist[o-1]==max){
+              dist[o-1] = dist[n-1] + 1;
+              explore(o);
             }
         }
-        void dfs(Node n){
-          nodes[n.value-1].setDistance(0);
-          n = nodes[n.value-1];
-          explore(n);
-        }
-        int distance(int x, int y){
-            Node n = nodes[x-1];
-            dfs(n);
-            int dist = nodes[y-1].getDistance();
-            return dist==max ? -1 : dist;
-        }
-    };
+    }
+    void dfs(int n){
+      for(int i=0;i<V;i++)
+        dist[i] = max;
+      dist[n-1] = 0;
+      explore(n);
+    }
+    int distance(int x, int y){
+        dfs(x);
+        int d = dist[y-1];
+        return d==max ? -1 : d;
+    }
+};
 int main(int argc, char const *argv[]) {
   // vertices and edges count
-  int n, m, start , goal;
-  cin>>n>>m;
-  Graph graph = Graph();
-  for (int i = 0; i < n; i++) {
-      graph.addVertex(i+1);
-  }
-  for (int i = 0; i < m; i++) {
+  int V, E, start , goal;
+  cin>>V>>E;
+  Graph g(V, E);
+  for (int i = 0; i < E; i++) {
       int x, y;
       cin>>x>>y;
-      graph.addEdge(x, y);
+      g.addEdge(x, y);
   }
   cin>>start>>goal;
-  cout<<"Distance : "<< graph.distance(start, goal)<<endl;
+  // g.print();
+  cout<<"Distance : "<< g.distance(start, goal)<<endl;
   return 0;
 }
