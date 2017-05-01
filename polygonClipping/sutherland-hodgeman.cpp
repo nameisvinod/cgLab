@@ -77,7 +77,8 @@ list<Point> clipLeft(list<Point> outputList){
 	list<Point> inputList = outputList;
 	outputList.clear();
 	Point S = inputList.back();
-	for(Point E : inputList){
+	for(std::list<Point>::iterator it=inputList.begin(); it != inputList.end(); ++it){
+	  Point E = *it;
 		//E inside clipEdge
 		if(E.x>xmin){
 			// S not inside clipEdge
@@ -96,7 +97,8 @@ list<Point> clipRight(list<Point> outputList){
 	list<Point> inputList = outputList;
 	outputList.clear();
 	Point S = inputList.back();
-	for(Point E : inputList){
+	for(std::list<Point>::iterator it=inputList.begin(); it != inputList.end(); ++it){
+	  Point E = *it;
 		//E inside clipEdge
 		if(E.x<xmax){
 			// S not inside clipEdge
@@ -115,7 +117,8 @@ list<Point> clipTop(list<Point> outputList){
 	list<Point> inputList = outputList;
 	outputList.clear();
 	Point S = inputList.back();
-	for(Point E : inputList){
+	for(std::list<Point>::iterator it=inputList.begin(); it != inputList.end(); ++it){
+	  Point E = *it;
 		//E inside clipEdge
 		if(E.y<ymax){
 			// S not inside clipEdge
@@ -134,7 +137,8 @@ list<Point> clipBottom(list<Point> outputList){
 	list<Point> inputList = outputList;
 	outputList.clear();
 	Point S = inputList.back();
-	for(Point E : inputList){
+	for(std::list<Point>::iterator it=inputList.begin(); it != inputList.end(); ++it){
+	  Point E = *it;
 		//E inside clipEdge
 		if(E.y>ymin){
 			// S not inside clipEdge
