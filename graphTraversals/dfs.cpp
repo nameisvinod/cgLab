@@ -33,6 +33,8 @@ class Graph{
     }
     void explore(int n) {
         // cout<<n<<endl;
+        // usleep(1000 * 1000); // takes microseconds
+        // drawFilledCircle(radius-1,xCoords[n-1] ,yCoords[n-1], inStackColor);
         for (int i=0;i<adj[n-1].size();i++) {
             int o = adj[n-1][i];
             if(dist[o-1]==max){
@@ -40,6 +42,8 @@ class Graph{
               explore(o);
             }
         }
+        // usleep(1000 * 1000); // takes microseconds
+        // drawFilledCircle(radius-1,xCoords[n-1] ,yCoords[n-1], processedColor);
     }
     void dfs(int n){
       for(int i=0;i<V;i++)

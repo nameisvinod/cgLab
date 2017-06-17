@@ -24,6 +24,7 @@ class Graph{
       adj[v - 1].push_back(u);
     }
     void print(){
+      
       for(int i=0;i<adj.size();i++){
         cout<< i+1 << "-----> ";
         for(int j=0;j<adj[i].size();j++)
@@ -58,12 +59,13 @@ class Graph{
 int main(int argc, char const *argv[]) {
   // vertices and edges count
   int V, E, start , goal;
+  int x, y;
   cin>>V>>E;
+  // cout<<V<<E<<endl;
   Graph g(V, E);
   for (int i = 0; i < E; i++) {
-      int x, y;
-      cin>>x>>y;
-      g.addEdge(x, y);
+    cin>>x>>y;
+    g.addEdge(x, y);
   }
   cin>>start>>goal;
   // g.print();
