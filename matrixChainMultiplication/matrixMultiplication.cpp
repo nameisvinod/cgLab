@@ -1,5 +1,6 @@
 #include<iostream>
 #include<limits.h>
+#include<stdlib.h>
 #include<string.h>
 using namespace std;
 typedef int boolean;
@@ -53,20 +54,24 @@ public:
   }
   void printOptimalParenthesizations() {
         boolean *inAResult = new boolean[n];
-        printOptimalParenthesizations(s, 1, n - 1, inAResult);
+        string str = printOptimalParenthesizations(s, 1, n - 1, inAResult, "");
+        cout<<str<<endl;
   }
-  void printOptimalParenthesizations(int** s, int i, int j,  /* for pretty printing: */ boolean* inAResult) {
-        if (i != j) {
-            printOptimalParenthesizations(s, i, s[i][j], inAResult);
-            printOptimalParenthesizations(s, s[i][j] + 1, j, inAResult);
-            string istr = inAResult[i] ? "_result " : " ";
-            string jstr = inAResult[j] ? "_result " : " ";
-            cout<<" A_" << i << istr << "* A_" << j << jstr<<endl;
-            inAResult[i] = 1;
-            inAResult[j] = 1;
-        }
+  string printOptimalParenthesizations(int** s, int i, int j, boolean* inAResult, string str) {
+        if(i==j)
+            return "";
+        string str1 = printOptimalParenthesizations(s, i, s[i][j], inAResult, str);
+        string str2 = printOptimalParenthesizations(s, s[i][j] + 1, j, inAResult, str);
+        // cout<<"str1 : " <<str1<<endl;
+        // cout<<"str2 : " <<str2<<endl;
+        string istr = inAResult[i] ? "" : std::to_string(i);
+        string jstr = inAResult[j] ? "" : std::to_string(j);
+        str = "(" + istr + str1 + jstr + str2 + ")";
+        // cout<<str<<endl;
+        inAResult[i] = 1;
+        inAResult[j] = 1;
+        return str;
     }
-
 };
 
 int main(int argc, char const *argv[]) {
